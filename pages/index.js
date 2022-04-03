@@ -21,7 +21,7 @@ export default function Home() {
 		<div className='flex justify-center'>
 			<div className='w-1/2 h-screen flex justify-center items-center'>
 				<h1 className='text-4xl font-bold'>
-					Hey, my name is {data.name}, I'm {data.age} years old, I lived in
+					Hey, my name is {data.name}, I'm {data.age} years old, I lived in{' '}
 					{data.address} and I'm a {data.role}.
 				</h1>
 			</div>
