@@ -41,14 +41,14 @@ jobs:
       - name: Login to ACR
         uses: azure/docker-login@v1
         with:
-          login-server: pipelinexample.azurecr.io
+          login-server: ${{ secrets.AZURE_REGISTRY }}
           username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
           password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
       - name: Build and Push image to ACR
         run: |
-          docker build . -t ${{ secrets.AZURE_REGISTRY }}:${{ github.sha }}
-          docker push ${{ secrets.AZURE_REGISTRY }}:${{ github.sha }}
+          docker build . -t ${{ secrets.AZURE_REGISTRY }}/pipeline-example-frontend:${{ github.sha }}
+          docker push ${{ secrets.AZURE_REGISTRY }}/pipeline-example-frontend:${{ github.sha }}
 
   deploy-stg:
     runs-on: ubuntu-latest
@@ -67,13 +67,13 @@ jobs:
         uses: 'azure/aci-deploy@v1'
         with:
           resource-group: pipeline-example
-          dns-name-label: pipeline-example-backend-stg
-          image: ${{secrets.AZURE_REGISTRY}}:${{ github.sha }}
+          dns-name-label: pipeline-example-frontend-stg
+          image: ${{ secrets.AZURE_REGISTRY }}/pipeline-example-frontend:${{ github.sha }}
           cpu: 1
           memory: 1.5
           registry-username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
           registry-password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
-          name: pipeline-example-backend-stg
+          name: pipeline-example-frontend-stg
           location: 'east us'
 
   deploy-prd:
@@ -93,11 +93,11 @@ jobs:
         uses: 'azure/aci-deploy@v1'
         with:
           resource-group: pipeline-example
-          dns-name-label: pipeline-example-backend-prd
-          image: ${{secrets.AZURE_REGISTRY}}:${{ github.sha }}
+          dns-name-label: pipeline-example-frontend-prd
+          image: ${{ secrets.AZURE_REGISTRY }}/pipeline-example-frontend:${{ github.sha }}
           cpu: 1
           memory: 1.5
           registry-username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
           registry-password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
-          name: pipeline-example-backend-prd
+          name: pipeline-example-frontend-prd
           location: 'east us'
