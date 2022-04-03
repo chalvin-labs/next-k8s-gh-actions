@@ -1,0 +1,55 @@
+name: Deploy Development
+
+on:
+  push:
+    branches: [dev]
+
+jobs:
+  build-push-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.AZURE_REGISTRY }}
+          username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Build and Push image to ACR
+        run: |
+          docker build . -t ${{ secrets.AZURE_REGISTRY }}/pipeline-example-frontend:${{ github.sha }}
+          docker push ${{ secrets.AZURE_REGISTRY }}/pipeline-example-frontend:${{ github.sha }}
+
+  deploy-dev:
+    runs-on: ubuntu-latest
+    needs: build-push-image
+    environment: development
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 'Deploy to Development'
+        uses: 'azure/aci-deploy@v1'
+        with:
+          resource-group: pipeline-example
+          dns-name-label: pipeline-example-frontend-dev
+          image: ${{secrets.AZURE_REGISTRY}}/pipeline-example-frontend:${{ github.sha }}
+          cpu: 1
+          memory: 1.5
+          registry-username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+          name: pipeline-example-frontend-dev
+          location: 'east us'
