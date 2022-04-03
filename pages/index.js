@@ -5,8 +5,10 @@ export default function Home() {
 	const [data, setData] = useState([])
 
 	const fetchData = async () => {
-		const res = await axios.get('http://localhost')
-		setData(res)
+		const { data } = await axios.get(
+			'http://pipeline-example-backend.centralus.azurecontainer.io/'
+		)
+		setData(data)
 	}
 
 	useEffect(() => {
