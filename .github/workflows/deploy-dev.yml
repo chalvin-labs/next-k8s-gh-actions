@@ -1,0 +1,77 @@
+name: Deploy Development
+
+on:
+  push:
+    branches: [dev]
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+
+      - name: Unit test
+        run: |
+          go test ./... -covermode=count -coverprofile=coverage.out
+          go test ./... -coverprofile=unit-test.out -json > unit-test.json
+
+      - name: Code coverage
+        run: |
+          go tool cover -func=coverage.out
+          go tool cover -html=coverage.out
+
+  build-push-image:
+    runs-on: ubuntu-latest
+    needs: unit-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: pipelinexample.azurecr.io
+          username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      - name: Build and Push image to ACR
+        run: |
+          docker build . -t ${{ secrets.AZURE_REGISTRY }}:${{ github.sha }}
+          docker push ${{ secrets.AZURE_REGISTRY }}:${{ github.sha }}
+
+  deploy-dev:
+    runs-on: ubuntu-latest
+    needs: build-push-image
+    environment: development
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 'Deploy to Development'
+        uses: 'azure/aci-deploy@v1'
+        with:
+          resource-group: pipeline-example
+          dns-name-label: pipeline-example-backend-dev
+          image: ${{secrets.AZURE_REGISTRY}}:${{ github.sha }}
+          cpu: 1
+          memory: 1.5
+          registry-username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+          name: pipeline-example-backend-dev
+          location: 'east us'

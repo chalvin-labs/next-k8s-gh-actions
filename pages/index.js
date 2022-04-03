@@ -6,7 +6,7 @@ export default function Home() {
 
 	const fetchData = async () => {
 		const { data } = await axios.get(
-			'http://pipeline-example-backend.centralus.azurecontainer.io/'
+			'http://pipeline-example-backend-prd.eastus.azurecontainer.io'
 		)
 		setData(data)
 	}
@@ -19,8 +19,11 @@ export default function Home() {
 
 	return (
 		<div className='flex justify-center'>
-			<div className='w-96 flex justify-center'>
-				<h1 className='text-4xl font-bold'>{data.name}</h1>
+			<div className='w-1/2 h-screen flex justify-center items-center'>
+				<h1 className='text-4xl font-bold'>
+					Hey, my name is {data.name}, I'm {data.age} years old, I lived in{' '}
+					{data.address} and I'm a {data.role} Engineer.
+				</h1>
 			</div>
 		</div>
 	)
