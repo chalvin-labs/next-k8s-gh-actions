@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipeline-example-frontend-dev
+  labels:
+    app: pipeline-example-frontend-dev
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: pipeline-example-frontend-dev
+  template:
+    metadata:
+      labels:
+        app: pipeline-example-frontend-dev
+    spec:
+      containers:
+        - name: pipeline-example-frontend-dev
+          image: pipelinexample.azurecr.io/pipeline-example-frontend
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80

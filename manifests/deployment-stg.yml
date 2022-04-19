@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipeline-example-backend-stg
+  labels:
+    app: pipeline-example-backend-stg
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: pipeline-example-backend-stg
+  template:
+    metadata:
+      labels:
+        app: pipeline-example-backend-stg
+    spec:
+      containers:
+        - name: pipeline-example-backend-stg
+          image: pipelinexample.azurecr.io/pipeline-example-backend
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80

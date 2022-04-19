@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipeline-example-backend-prd
+  labels:
+    app: pipeline-example-backend-prd
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: pipeline-example-backend-prd
+  template:
+    metadata:
+      labels:
+        app: pipeline-example-backend-prd
+    spec:
+      containers:
+        - name: pipeline-example-backend-prd
+          image: pipelinexample.azurecr.io/pipeline-example-backend
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80

@@ -5,9 +5,7 @@ export default function Home() {
 	const [data, setData] = useState([])
 
 	const fetchData = async () => {
-		const { data } = await axios.get(
-			'http://pipeline-example-backend-prd.eastus.azurecontainer.io'
-		)
+		const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_ENDPOINT}`)
 		setData(data)
 	}
 
@@ -15,14 +13,12 @@ export default function Home() {
 		fetchData()
 	}, [])
 
-	console.log(data)
-
 	return (
 		<div className='flex justify-center'>
 			<div className='w-1/2 h-screen flex justify-center items-center'>
 				<h1 className='text-4xl font-bold'>
-					Hey, my name is {data.name}, I'm {data.age} years old, I lived in{' '}
-					{data.address} and I'm a {data.role}.
+					Hey, my name is {data.name}, I'm {data.age} years old, I live in{' '}
+					{data.address}.
 				</h1>
 			</div>
 		</div>
