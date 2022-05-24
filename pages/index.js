@@ -5,7 +5,7 @@ export default function Home() {
 	const [data, setData] = useState([])
 
 	const fetchData = async () => {
-		const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_ENDPOINT}`)
+		const { data } = await axios.get('http://20.121.183.142/')
 		setData(data)
 	}
 
